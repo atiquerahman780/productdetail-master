@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'checkout.dart';
 import 'localStorage/Category_Services.dart';
 import 'localStorage/category1.dart';
 class cart extends StatefulWidget {
@@ -10,6 +11,29 @@ class cart extends StatefulWidget {
 }
 
 class _cartState extends State<cart> {
+
+
+  //int sum=0;
+
+
+
+
+   // _pategorylist= as List;
+
+   // print("sum="+sum.toString());
+    //assignlistvaluefunction();
+
+
+
+
+
+
+
+
+
+
+
+
   var pategory;
   var _petagory=Petagory();
   var _PetagoryServices=PetagoryServices();
@@ -25,11 +49,13 @@ class _cartState extends State<cart> {
             setState(() {
               print("size"+_pategorylist.length.toString());
               _pategorylist.removeAt(index);
-
+              //u.r=_pategorylist.length.toString();
               print("size"+_pategorylist.length.toString());
               _pategorylist = _pategorylist;
+
               print("pategory"+index.toString());
               Navigator.pop(p);
+              getAllPategory();
 
 
 
@@ -46,7 +72,7 @@ class _cartState extends State<cart> {
   }
 
 
-  _editFormDialog(BuildContext context){
+  /*_editFormDialog(BuildContext context){
     return showDialog(context: context,barrierDismissible: true, builder: (pragma) {
       return SingleChildScrollView(
         child: AlertDialog(
@@ -92,18 +118,23 @@ class _cartState extends State<cart> {
         ),
       );
     },);
-  }
+  }*/
 
   @override
   void initState(){
     super.initState();
     getAllPategory();
+
   }
   getAllPategory() async{
+    int sum =0;
     _pategorylist =<Petagory>[];
+   // u.r=_pategorylist.length.toString();
+   // print("size"+u.r);
     var categories=await _petagoryServices.readCategories();
     categories.forEach((petagory){
       setState(() {
+
         var petagoryModel1=Petagory();
         petagoryModel1.image=petagory['image'];
         petagoryModel1.name=petagory['name'];
@@ -113,6 +144,19 @@ class _cartState extends State<cart> {
 
         petagoryModel1.id=petagory['id'];
         _pategorylist.add(petagoryModel1);
+        u.r=_pategorylist.length.toString();
+        print("size"+u.r);
+        print(petagoryModel1.price);
+
+
+
+          int a=int.parse(petagoryModel1.price);
+
+           sum=sum+a;
+
+
+        print("sum="+sum.toString());
+        i.m=sum.toString();
       });
     });
   }
@@ -121,32 +165,10 @@ class _cartState extends State<cart> {
     pategory= await _petagoryServices.readCategoriesById(pategoryId);
     setState(() {
      // _editpategoryquantitycontroler.text=pategory[0]['quantity']??'No Name';
-
     });
-    _editFormDialog(context);
+   // _editFormDialog(context);
   }
-
   var _petagoryServices=PetagoryServices();
-
-
-
-
-
-
-
-  void _incrementCounter() {
-    setState(() {
-      int.parse(staticquantity.quantity)+1;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      if (int.parse(staticquantity.quantity) > 1) {
-        int.parse(staticquantity.quantity)-1;
-      }
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -157,8 +179,8 @@ class _cartState extends State<cart> {
           body: Container(
               child:Column(
                 children: [
-                  Container(
-                    height: 510,
+                  Expanded(
+
                     child:
                     Center(
                       child: ListView.builder(
@@ -186,9 +208,35 @@ class _cartState extends State<cart> {
                                                 child: Row(
                                                   children: [
                                                     InkWell(
-                                                        onTap: () {
-                                                          _editPategory(context, _pategorylist[index].id);
-                                                        },
+                                                        onTap: () async{
+                                                         // _editPategory(context, _pategorylist[index].id);
+                                                          int qu=int.parse(_pategorylist[index].quantity);
+                                                          if (qu > 1) {
+                                                            qu--;
+                                                          }
+
+
+                                                            print("ooooo"+qu.toString());
+                                                            _petagory.id=_pategorylist[index].id;
+                                                            _petagory.quantity=qu.toString();
+                                                            int updateprice= qu*400;
+                                                            String price=updateprice.toString();
+                                                            _petagory.name="atique";
+                                                            _petagory.size="large size unit";
+                                                            _petagory.price=price;
+                                                            _petagory.image="https://picsum.photos/seed/picsum/200/300";
+                                                            print(_editpategoryquantitycontroler.text);
+
+                                                            var result  = await _petagoryServices.updatePetagory(_petagory);
+                                                            setState(() {
+
+
+                                                              getAllPategory();
+
+                                                              print(result);
+                                                            });
+
+                                                          },
                                                         child: Icon(
                                                           Icons.remove,
                                                           color: Colors.white,
@@ -279,6 +327,97 @@ class _cartState extends State<cart> {
                     ),
                   ),
 
+                  Container(
+                    height: 150,
+                    child: Card(
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(" Item(s)")
+                              ),
+                              Expanded(child: SizedBox()),
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child:Text(u.r)
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(" Item Total")
+                              ),
+                              Expanded(child: SizedBox()),
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child:Text(i.m)
+                              ),
+
+                            ],
+                          ),
+
+                          Row(
+
+                            children: [
+
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(" Deliver Charges")
+                              ),
+                              Expanded(child: SizedBox()),
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child:Text("0")
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(" Discount")
+                              ),
+                              Expanded(child: SizedBox()),
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child:Text("0")
+                              ),
+                            ],
+                          ),
+                          const Divider(
+                            height: 5,
+                            thickness: 2,
+                            indent: 5,
+                            endIndent: 5,
+                          ),
+                          Row(
+                            children: [
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(" Total Price")
+                              ),
+                              Expanded(child: SizedBox()),
+                              Align(
+                                  alignment: Alignment.topRight,
+                                  child:Text(i.m)
+                              ),
+                            ],
+                          ),
+                          ElevatedButton(onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => checkout()),
+                            );
+                          }, child: Text("Proceed to Check Out"))
+                        ],
+                      ),
+                    ),
+                  )
+
                 ],
               )
           )
@@ -291,4 +430,10 @@ class _cartState extends State<cart> {
 }
 class staticquantity{
   static String quantity='';
+}
+class u{
+  static String r='';
+}
+class i{
+  static String m ='';
 }
